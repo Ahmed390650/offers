@@ -3,11 +3,18 @@ import { Button } from "@/components/ui/button";
 import { defaultValues, droneSchema } from "@/lib/validation";
 import z from "zod";
 import { useAppForm } from "./Form/hooks";
-import { Card, CardContent, CardHeader } from "./ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Field, FieldGroup } from "./ui/field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import supabase from "@/lib/supabase/server";
 import React from "react";
+
+const instruction = [
+  "تأكد من ملء جميع الحقول المطلوبة .",
+  'راجع المعلومات المدخلة قبل الضغط على زر "حفظ" لضمان الدقة.',
+  'بعد الحفظ، يمكنك مراجعة البيانات المدخلة في قسم "عرض الطائرات".',
+  "اقصي تحميل للصور او الملفات هوا 100 ميجا بايت.",
+];
 const getZodType = (schema: z.ZodSchema) => {
   if (schema.def?.checks?.[0]?._zod.def?.minimum === 10) {
     return "textarea";
@@ -41,11 +48,8 @@ export function DroneForm({
   const [isLoading, setIsLoading] = React.useState(false);
   const FormApp = useAppForm({
     defaultValues: defaultValuesId ?? (defaultValues as droneForm),
+
     onSubmit: async ({ value }) => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      console.log({ session });
       setIsLoading(true);
       const {
         BasicInfo,
@@ -53,7 +57,6 @@ export function DroneForm({
         communication,
         company,
         extra_features,
-        files,
         flight_performance,
         motor_system,
         navigation,
@@ -82,8 +85,7 @@ export function DroneForm({
         throw new Error(error.message);
       }
       setIsLoading(false);
-
-      console.log({ data }, "succes");
+      window.alert("تم حفظ البيانات بنجاح!");
     },
     onSubmitInvalid(props) {
       console.log(props.formApi.getAllErrors());
@@ -96,19 +98,18 @@ export function DroneForm({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              FormApp.handleSubmit();
             }}
           >
             <FieldGroup>
               <Tabs dir="rtl" defaultValue="company">
-                <TabsList className="w-full overflow-scroll">
+                <TabsList className="max-w-7xl flex flex-wrap h-full gap-2 lg:w-full">
                   {parsedSections.map(({ sectionName, label }) => (
                     <TabsTrigger value={sectionName} key={sectionName}>
                       {label ?? sectionName}
                     </TabsTrigger>
                   ))}
                 </TabsList>
-                {parsedSections.map(({ keys, sectionName, label }) => {
+                {parsedSections.map(({ keys, sectionName, label }, i) => {
                   return (
                     <TabsContent key={sectionName} value={sectionName}>
                       <Card>
@@ -180,17 +181,38 @@ export function DroneForm({
                             );
                           })}
                         </CardContent>
+                        {parsedSections.length === i + 1 && (
+                          <CardFooter className="flex justify-end ">
+                            <Field>
+                              <div
+                                dir="rtl"
+                                className="w-full p-4 flex flex-col gap-2 bg-white border border-gray-200 rounded-md shadow-sm"
+                              >
+                                <h1>تعليمات أستخدام البرنامج</h1>
+                                <ul className="list-disc list-inside">
+                                  {instruction.map((inst, index) => (
+                                    <li key={index}>{inst}</li>
+                                  ))}
+                                </ul>
+                                <Button
+                                  disabled={isLoading}
+                                  onClick={() => FormApp.handleSubmit()}
+                                  type="submit"
+                                  className=""
+                                >
+                                  {isLoading ? "جاري الحفظ..." : "حفظ"}
+                                </Button>
+                              </div>
+                            </Field>
+                          </CardFooter>
+                        )}
                       </Card>
                     </TabsContent>
                   );
                 })}
               </Tabs>
 
-              <Field>
-                <Button type="submit">
-                  {isLoading ? "جاري الارسال..." : "حفظ"}
-                </Button>
-              </Field>
+              <Field></Field>
             </FieldGroup>
           </form>
         </div>

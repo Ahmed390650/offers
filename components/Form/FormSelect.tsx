@@ -1,4 +1,4 @@
-import { DynamicSelect } from "../ui/dynamic-select";
+import DynamicSelect from "../ui/dynamic-select";
 import { FieldLabel } from "../ui/field";
 import { FormBase, FormControlProps } from "./BaseForm";
 import { useFieldContext } from "./hooks";

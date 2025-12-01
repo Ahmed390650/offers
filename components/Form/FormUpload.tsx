@@ -15,12 +15,23 @@ const FormUpload = (
   const [uploading, setUploading] = useState(false);
 
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-
+  console.log(field.form.getFieldValue("BasicInfo.drone_name"));
   const handleUpload = async (file: File) => {
     setUploading(true);
-
+    const selectedFile = file;
+    if (selectedFile.size > 100 * 1024 * 1024) {
+      // 100mb
+      alert("الملف كبير جدًا، الحد الأقصى 100 ميجابايت.");
+      return;
+    }
+    const companyName =
+      field.form.getFieldValue("company.company_name") || "unknown-company";
+    const droneName =
+      field.form.getFieldValue("BasicInfo.drone_name") || "unknown-drone";
     const bucket = field.name.replace("files.", ""); // ضع اسم الباكيت الصحيح
-    const filePath = `drones/${Date.now()}-${file.name}`;
+    const filePath = `${companyName.toLowerCase()}/${droneName.toLowerCase()}/${Date.now()}-${
+      file.name
+    }`;
 
     const { error } = await supabase.storage
       .from(bucket)
@@ -32,19 +43,26 @@ const FormUpload = (
       return;
     }
 
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = await supabase.storage
       .from(bucket)
-      .getPublicUrl(filePath);
-
+      .createSignedUrl(filePath, 600);
     // append new URL
-    field.handleChange([...(field.state.value || []), urlData.publicUrl]);
+    field.handleChange([
+      ...(field.state.value || []),
+      urlData?.signedUrl || "",
+    ]);
 
     setUploading(false);
   };
 
   return (
     <FormBase {...props}>
-      <FieldLabel>{props.label}</FieldLabel>
+      <FieldLabel>
+        {props.label}
+
+        <span className="text-red-500">*</span>
+        <span className="text-red-400">اقصي حجم 100MB </span>
+      </FieldLabel>
 
       <Input
         {...props}
@@ -68,7 +86,7 @@ const FormUpload = (
       )}
 
       {/* Preview Images */}
-      {field.state.value?.length > 0 && (
+      {field.name === "files.images" && field.state.value?.length > 0 && (
         <div className="grid grid-cols-3 gap-2 mt-3">
           {field.state.value.map((img, i) => (
             <Image

@@ -83,7 +83,7 @@ export const droneSchema = z.object({
       anti_signal_interference: z.boolean().describe("مضاد لتداخل الإشارة"),
       antijamming_notes: TEXTAREA.describe("ملاحظات مكافحة التشويش"),
     })
-    .describe("مكافحة التشويش"),
+    .describe("نظام الاعاقة"),
 
   extra_features: z
     .object({
@@ -138,7 +138,7 @@ export const defaultValues = {
   },
 
   motor_system: {
-    motor_type: ["Brushless Electric"],
+    motor_type: ["محرك كهربائي", "محرك بنزين", "محرك هجين"],
     motor_count: 4,
     motor_notes: "محركات بدون فرش عالية الكفاءة بقدرة 920KV.",
   },
@@ -166,12 +166,7 @@ export const defaultValues = {
   },
 
   extra_features: {
-    list: [
-      "إقلاع وهبوط تلقائي",
-      "Return-To-Home",
-      "تفادي العقبات",
-      "بث فيديو FHD في الوقت الحقيقي",
-    ],
+    list: ["إقلاع وهبوط تلقائي", "Return-To-Home"],
     extra_features_notes: "الطائرة مزودة بخوارزميات ذكية للعودة التلقائية.",
   },
 

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "./input";
 
-export function DynamicSelect({
+function DynamicSelect({
   name,
   value = [""],
   onChange,
@@ -95,3 +95,5 @@ export function DynamicSelect({
     </div>
   );
 }
+
+export default memo(DynamicSelect);
