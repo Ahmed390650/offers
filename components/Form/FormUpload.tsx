@@ -15,7 +15,7 @@ const FormUpload = (
   const [uploading, setUploading] = useState(false);
 
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-  console.log(field.form.getFieldValue("BasicInfo.drone_name"));
+  
   const handleUpload = async (file: File) => {
     setUploading(true);
     const selectedFile = file;
@@ -45,7 +45,7 @@ const FormUpload = (
 
     const { data: urlData } = await supabase.storage
       .from(bucket)
-      .createSignedUrl(filePath, 600);
+      .createSignedUrl(filePath, 600000000000);
     // append new URL
     field.handleChange([
       ...(field.state.value || []),
