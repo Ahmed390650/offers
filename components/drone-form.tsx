@@ -47,8 +47,6 @@ export function DroneForm({
 }) {
   const [isLoading, setIsLoading] = React.useState(false);
   const FormApp = useAppForm({
-    defaultValues: defaultValuesId ?? (defaultValues as droneForm),
-
     onSubmit: async ({ value }) => {
       setIsLoading(true);
       const {
